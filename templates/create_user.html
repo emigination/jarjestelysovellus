@@ -1,0 +1,12 @@
+<title>Tavaroidenjärjestelysovellus</title>
+<h1>Luo uusi käyttäjä</h1>
+<form action="/register" method="POST">
+<p>Käyttäjätunnus:<br>
+<input type="text" name="name"></p>
+<p>Salasana:<br>
+<input type="password" name="password"></p>
+<input type="submit" value="Luo käyttäjä">
+</form>
+{% if error %}
+<p>Epäonnistui :(</p>
+{% endif %}

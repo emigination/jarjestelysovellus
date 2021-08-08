@@ -1,0 +1,8 @@
+<title>Tavaroidenjärjestelysovellus</title>
+<h1>Haun tulokset</h1>
+
+{% for itm in item %}
+<p>Tavara: {{itm.name}}</p>
+<p>Sijainti: {{itm.location}}</p>
+<br>
+{% endfor %}

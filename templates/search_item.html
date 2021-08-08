@@ -1,0 +1,14 @@
+<title>Tavaroidenjärjestelysovellus</title>
+<h1>Etsi tavara</h1>
+
+<form action="/fetch_item" method="POST">
+<p>Tavaran nimi:<br>
+<input type="text" name="name"></p>
+<input type="submit" value="Etsi tavara">
+</form>
+<form action="/fetch_all_items" method="POST">
+<input type="submit" value="Etsi kaikki tavarani">
+</form>
+{% if error %}
+<p>Haettua tavaraa ei löytynyt</p>
+{% endif %}

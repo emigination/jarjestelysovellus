@@ -1,0 +1,23 @@
+<title>Tavaroidenjärjestelysovellus</title>
+<h1>Etusivu</h1>
+{% if session.name %}
+<p>Olet kirjautuneena sisään.</p>
+<p><a href="/add_item">Lisää tavara</a></p>
+<p><a href="/search_item">Etsi tavara</a></p>
+<p><a href="/logout">Kirjaudu ulos</a></p>
+{% else %}
+<form action="/login" method="POST">
+<p>Käyttäjätunnus:<br>
+<input type="text" name="name"></p>
+<p>Salasana:<br>
+<input type="password" name="password"></p>
+<input type="submit" value="Kirjaudu sisään">
+</form>
+{% if error=='no_user' %}
+<p>Käyttäjää ei ole!</p>
+{% endif %}
+{% if error=='wrong_pw' %}
+<p>Salasana tai käyttäjänimi väärin!</p>
+{% endif %}
+<a href="/create_user">Luo uusi käyttäjä</a>
+{% endif %}

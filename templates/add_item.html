@@ -1,0 +1,13 @@
+<title>Tavaroidenjärjestelysovellus</title>
+<h1>Lisää tavara</h1>
+
+<form action="/new_item" method="POST">
+<p>Tavaran nimi:<br>
+<input type="text" name="name"></p>
+<p>Sijainti:<br>
+<input type="text" name="location"></p>
+<input type="submit" value="Luo tavara">
+</form>
+{% if error %}
+<p>Epäonnistui :(</p>
+{% endif %}
