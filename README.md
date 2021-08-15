@@ -1,6 +1,6 @@
 # Tavaroidenjärjestelysovellus
 
-Sovelluksen päätarkoitus on erilaisten tavaroiden sijainneista kirjanpitäminen. "Esineen" ei tarvitse olla kirjaimellinen esine, vaan se voi olla myös vaikkapa rakennus tai tiedosto
+Sovelluksen päätarkoitus on erilaisten tavaroiden sijainneista kirjanpitäminen. "Esineen" ei tarvitse olla kirjaimellinen esine, vaan se voi olla myös vaikkapa rakennus tai tiedosto.
 
 [Linkki sovellukseen!](https://tavaroidenjarjestelysovellus.herokuapp.com/)
 
