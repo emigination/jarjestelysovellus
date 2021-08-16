@@ -1,42 +1,22 @@
 <!DOCTYPE html>
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-<title>Tavaroidenjärjestelysovellus</title>
-<div class="container">
-    <nav class="navbar navbar-expand-sm navbar-light">
-        <a class="navbar-brand" href="#">Tavaroidenjärjestelysovellus</a>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="#">Lisää tavara</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Selaa tavaroita</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Page 3</a>
-            </li>
-        </ul>
-    </nav>
-    <h1>Etusivu</h1>
-    {% if session.name %}
-    <p>Olet kirjautuneena sisään.</p>
-    <p><a href="/add_item">Lisää tavara</a></p>
-    <p><a href="/search_item">Etsi tavara</a></p>
-    <p><a href="/logout">Kirjaudu ulos</a></p>
-    {% else %}
-    <form action="/login" method="POST">
-        <p>Käyttäjätunnus:<br>
-            <input type="text" name="name">
-        </p>
-        <p>Salasana:<br>
-            <input type="password" name="password">
-        </p>
-        <input type="submit" value="Kirjaudu sisään">
-    </form>
-    {% if error==1 %}
-    <p>Salasana väärin tai käyttäjää ei ole!</p>
-    {% endif %}
-    <br>
-    <a href="/create_user">Luo uusi käyttäjä</a>
-    {% endif %}
-</div>
+{% extends "layout.html" %}
+{% block pagename %} Etusivu {% endblock %}
+{% block content %}
+<p>Olet kirjautuneena sisään.</p>
+{% endblock %}
+{% block notlogged %}
+<form action="/login" method="POST">
+    <p>Käyttäjätunnus:<br>
+        <input type="text" name="name">
+    </p>
+    <p>Salasana:<br>
+        <input type="password" name="password">
+    </p>
+    <input type="submit" value="Kirjaudu sisään">
+</form>
+{% if error==1 %}
+<p>Salasana väärin tai käyttäjää ei ole!</p>
+{% endif %}
+<br>
+<a href="/create_user">Luo uusi käyttäjä</a>
+{% endblock %}

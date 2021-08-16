@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<title>Tavaroidenjärjestelysovellus</title>
-<h1>Haun tulokset</h1>
-
+{% extends "layout.html" %}
+{% block pagename %} Haun tulokset {% endblock %}
+{% block content %}
 {% for itm in item %}
 <p>Tavara: {{itm.name}}</p>
 <p>Sijainti: {{itm.location}}</p>
 <br>
 {% endfor %}
+{% endblock %}
+{% block notlogged %}
+<p>Sinun pitää <a href="/">kirjautua sisään</a> tai <a href="/create_user">luoda käyttäjätili</a>!</p>
+{% endblock %}

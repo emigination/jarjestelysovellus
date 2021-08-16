@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<title>Tavaroidenjärjestelysovellus</title>
-<h1>Etsi tavara</h1>
-
+{% extends "layout.html" %}
+{% block pagename %} Etsi tavara {% endblock %}
+{% block content %}
 <form action="/fetch_item" method="GET">
     <p>Tavaran nimi:<br>
         <input type="text" name="name">
@@ -14,3 +14,7 @@
 {% if error %}
 <p>Haettua tavaraa ei löytynyt</p>
 {% endif %}
+{% endblock %}
+{% block notlogged %}
+<p>Sinun pitää <a href="/">kirjautua sisään</a> tai <a href="/create_user">luoda käyttäjätili</a>!</p>
+{% endblock %}

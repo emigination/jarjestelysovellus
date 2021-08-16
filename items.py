@@ -9,7 +9,6 @@ def new_item(name, location):
             sql, {"name": name, "location": location, "owner_id": session["user_id"]})
         db.session.commit()
     except Exception as e:
-        print(e)
         return False
     return True
 

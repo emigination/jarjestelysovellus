@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<title>Tavaroidenjärjestelysovellus</title>
-<h1>Lisää tavara</h1>
-
+{% extends "layout.html" %}
+{% block pagename %} Lisää tavara {% endblock %}
+{% block content %}
 <form action="/new_item" method="POST">
     <p>Tavaran nimi:<br>
         <input type="text" name="name">
@@ -14,3 +14,7 @@
 {% if error %}
 <p>{{error}}</p>
 {% endif %}
+{% endblock %}
+{% block notlogged %}
+<p>Sinun pitää <a href="/">kirjautua sisään</a> tai <a href="/create_user">luoda käyttäjätili</a>!</p>
+{% endblock %}

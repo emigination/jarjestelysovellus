@@ -1,6 +1,10 @@
 <!DOCTYPE html>
-<title>Tavaroidenjärjestelysovellus</title>
-<h1>Luo uusi käyttäjä</h1>
+{% extends "layout.html" %}
+{% block pagename %} Luo uusi käyttäjä {% endblock %}
+{% block content %}
+<p>Olet jo kirjautuneena sisään!</p>
+{% endblock %}
+{% block notlogged %}
 <form action="/register" method="POST">
     <p>Käyttäjätunnus:<br>
         <input type="text" name="name">
@@ -13,3 +17,4 @@
 {% if error %}
 <p>{{error}}</p>
 {% endif %}
+{% endblock %}

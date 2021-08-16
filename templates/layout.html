@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<title>Tavaroidenjärjestelysovellus</title>
+<div class="container">
+    <nav class="navbar navbar-expand-sm navbar-light">
+        <a class="navbar-brand" href="/">Tavaroidenjärjestelysovellus</a>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/add_item">Lisää tavara</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/search_item">Selaa tavaroita</a>
+            </li>
+            <li class="nav-item">
+                {% if session.name %}
+                <a class="nav-link" href="/logout">Kirjaudu ulos</a>
+                {% else %}
+                <a class="nav-link" href="/">Kirjaudu sisään</a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+    <h1>{% block pagename %}{% endblock %}</h1>
+    {% if session.name %}
+    {% block content %}{% endblock %}
+    {% else %}
+    {% block notlogged %}{% endblock %}
+    {% endif %}
+</div>
