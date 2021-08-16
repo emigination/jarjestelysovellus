@@ -41,7 +41,7 @@ def register():
     name = request.form["name"]
     password = request.form["password"]
     if len(name) < 2 or len(name) > 50:
-        return render_template("create_user.html", error="Käyttäjänimen pituuden tulee olla 2–50 merkkiä!")
+        return render_template("create_user.html", error="Käyttäjätunnuksen pituuden tulee olla 2–50 merkkiä!")
     if len(password) < 6 or len(password) > 50:
         return render_template("create_user.html", error="Salasanan pituuden tulee olla 6–50 merkkiä!")
     if users.create_user(name, password):
@@ -77,7 +77,7 @@ def search_item():
     return render_template("search_item.html")
 
 
-@app.route("/fetch_item", methods=["GET"])
+@app.route("/fetch_item")
 def fetch_item():
     name = request.args["name"]
     result = items.find_by_name(name)
@@ -87,7 +87,7 @@ def fetch_item():
         return render_template("search_item.html", error=1)
 
 
-@app.route("/fetch_all_items", methods=["GET"])
+@app.route("/fetch_all_items")
 def fetch_all_items():
     result = items.fetch_all_items()
     if result:

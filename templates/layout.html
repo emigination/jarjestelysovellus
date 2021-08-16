@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css">
 <title>Tavaroidenjärjestelysovellus</title>
-<div class="container">
+<div class="container-fluid">
     <nav class="navbar navbar-expand-sm navbar-light">
         <a class="navbar-brand" href="/">Tavaroidenjärjestelysovellus</a>
         <ul class="navbar-nav">
@@ -22,6 +22,7 @@
         </ul>
     </nav>
     <h1>{% block pagename %}{% endblock %}</h1>
+    <br>
     {% if session.name %}
     {% block content %}{% endblock %}
     {% else %}
