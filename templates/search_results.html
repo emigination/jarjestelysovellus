@@ -2,11 +2,13 @@
 {% extends "layout.html" %}
 {% block pagename %} Haun tulokset {% endblock %}
 {% block content %}
-{% for itm in item %}
-<p>Tavara: {{itm.name}}<br>
-    Sijainti: {{itm.location}}<br>
-    <!-- <a href="/">Muokkaa</a>       <a href="/">Poista</a> -->
-</p>
+{% for item in items %}
+<p>Tavara: {{item.name}}<br>
+    Sijainti: {{item.location}}</p>
+    <form action="/edit_item/{{item.id}}" method="GET">
+        <input type="submit" value="Muokkaa">
+    </form>
+<br>
 <br>
 {% endfor %}
 {% endblock %}

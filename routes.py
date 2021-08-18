@@ -82,7 +82,7 @@ def fetch_item():
     name = request.args["name"]
     result = items.find_by_name(name)
     if result:
-        return render_template("search_results.html", item=result)
+        return render_template("search_results.html", items=result)
     else:
         return render_template("search_item.html", error=1)
 
@@ -91,6 +91,28 @@ def fetch_item():
 def fetch_all_items():
     result = items.fetch_all_items()
     if result:
-        return render_template("search_results.html", item=result)
+        return render_template("search_results.html", items=result)
     else:
         return render_template("search_item.html", error=1)
+
+
+@app.route("/edit_item/<int:id>")
+def edit_item(id):
+    item = items.find_by_id(id)
+    return render_template("edit_item.html", item=item)
+
+
+@app.route("/update_item/<int:id>", methods=["POST"], )
+def update_item(id):
+    name = request.form["name"]
+    location = request.form["location"]
+    if len(name) > 100:
+        error = 'Nimi on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
+    elif len(location) > 100:
+        error = 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
+    elif items.edit(id, name, location):
+        return redirect("/")
+    else:
+        error = 'Epäonnistui :('
+    item = items.find_by_id(id)
+    return render_template("edit_item.html", item=item, error=error)

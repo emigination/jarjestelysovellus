@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+{% block pagename %} Muokkaa tavaraa {% endblock %}
+{% block content %}
+<form action="/update_item/{{item.id}}" method="POST">
+    <p>Tavaran nimi:<br>
+        <input type="text" name="name" value="{{item.name}}">
+    </p>
+    <p>Sijainti:<br>
+        <input type="text" name="location" value="{{item.location}}">
+    </p><br>
+    <input type="submit" value="Tallenna muutokset">
+</form>
+{% if error %}
+<p>{{error}}</p>
+{% endif %}
+{% endblock %}
+{% block notlogged %}
+<p>Sinun pitää <a href="/">kirjautua sisään</a> tai <a href="/create_user">luoda käyttäjätili</a>!</p>
+{% endblock %}
