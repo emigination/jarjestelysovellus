@@ -2,6 +2,7 @@
 {% extends "layout.html" %}
 {% block pagename %} Etsi tavara {% endblock %}
 {% block content %}
+<p>Sinulla on yhteensä xyz tavaraa.</p>
 <form action="/fetch_item" method="GET">
     <p>Tavaran nimi:<br>
         <input type="text" name="name">

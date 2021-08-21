@@ -2,11 +2,20 @@ from flask import session
 from db import db
 
 
-def new_item(name, location):
+def new_item(name, parent_item, location, dimensions, year, tags):
     try:
-        sql = "INSERT INTO items (name,location,owner_id) VALUES (:name,:location,:owner_id)"
+        parent_id = find_by_name(parent_item).id
+        sql = "INSERT INTO items (name,location_id,location,dimensions,year) VALUES (:name,:parent_id,:location,:dimensions,:year)"
+        db.session.execute(sql, {"name": name, "location_id": parent_id, "location": location,
+                                 "dimensions": dimensions, "year": year})
+        item_id = find_by_name(name).id
+        sql = "INSERT INTO owners (item_id, user_id) VALUES (:item_id,:user_id)"
         db.session.execute(
-            sql, {"name": name, "location": location, "owner_id": session["user_id"]})
+            sql, {"item_id": item_id, "user_id": session["user_id"]})
+        taglist = tags.split(' ')
+        for tag in taglist:
+            sql = "INSERT INTO tags (tag, item_id) VALUES (:tag, :item_id)"
+            db.session.execute(sql, {"tag": tag, "item_id": item_id})
         db.session.commit()
     except Exception as e:
         return False
@@ -26,9 +35,9 @@ def edit(id, name, location):
 
 def find_by_name(name):
     sql = "SELECT id, name, location FROM items WHERE name=:name AND owner_id=:owner_id"
-    items = db.session.execute(
+    item = db.session.execute(
         sql, {"name": name, "owner_id": session["user_id"]}).fetchall()
-    return items
+    return item
 
 
 def find_by_id(id):
@@ -40,5 +49,6 @@ def find_by_id(id):
 
 def fetch_all_items():
     sql = "SELECT id, name, location FROM items WHERE owner_id=:owner_id"
-    items = db.session.execute(sql, {"owner_id": session["user_id"]}).fetchall()
+    items = db.session.execute(
+        sql, {"owner_id": session["user_id"]}).fetchall()
     return items

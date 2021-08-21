@@ -47,10 +47,9 @@ def register():
     if users.create_user(name, password):
         session["name"] = name
         session["user_id"] = users.fetch_user(name).id
-        return redirect("/")
+        return render_template("success.html", title="Luo uusi käyttäjä", action="Käyttäjätunnuksen luonti")
     else:
         return render_template("create_user.html", error="Käyttäjätunnus on jo käytössä!")
-
 
 @app.route("/add_item")
 def add_item():
@@ -60,13 +59,31 @@ def add_item():
 @app.route("/new_item", methods=["POST"])
 def new_item():
     name = request.form["name"]
+    parent_item = request.form["parent_item"]
     location = request.form["location"]
+    dimensions = request.form["dimensions"]
+    year = request.form["year"]
+    tags = request.form["tags"]
     if len(name) > 100:
         error = 'Nimi on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
+    elif items.find_by_name(name):
+        error = 'Sinulla on jo samanniminen tavara!'
+    elif len(parent_item) > 100 or not items.find_by_name(parent_item):
+        error = 'Sisältävää tavaraa ei löydy. Tarkista, että kirjoitit sen nimen oikein.'
     elif len(location) > 100:
         error = 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif items.new_item(name, location):
-        return redirect("/")
+    elif len(dimensions) > 100:
+        error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
+    elif year>9999 or year<0:
+        error = 'Vuoden tulee olla väliltä 0-9999'
+    elif len(dimensions) > 100:
+        error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
+    elif len(tags) > 100:
+        error = 'Tägien yhteispituus saa olla enintään 100 merkkiä.'
+    elif len(tags) > 100:
+        error = 'Tägien yhteispituus saa olla enintään 100 merkkiä.'
+    elif items.new_item(name, parent_item, location, dimensions, year, tags):
+        return render_template("success.html", title="Lisää tavara", action="Tavaran lisäys")
     else:
         error = 'Epäonnistui :('
     return render_template("add_item.html", error=error)
@@ -111,7 +128,7 @@ def update_item(id):
     elif len(location) > 100:
         error = 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
     elif items.edit(id, name, location):
-        return redirect("/")
+        return render_template("success.html", title="Muokkaa tavaraa", action="Tavaran muokkaus")
     else:
         error = 'Epäonnistui :('
     item = items.find_by_id(id)

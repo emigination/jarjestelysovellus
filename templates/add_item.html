@@ -3,14 +3,33 @@
 {% block pagename %} Lisää tavara {% endblock %}
 {% block content %}
 <form action="/new_item" method="POST">
-    <p>Tavaran nimi:<br>
-        <input type="text" name="name">
-    </p>
-    <p>Sijainti:<br>
-        <input type="text" name="location">
-    </p>
-    <input type="submit" value="Luo tavara">
+    <div class="form-group">
+        <label for="name">Tavaran nimi: </label>
+        <input type="text" class="form-control" id="name" name="name">
+    </div>
+    <div class="form-group">
+        <label for="parent_item">Sisältävä tavara (tavaran nimi)*: </label>
+        <input type="text" class="form-control" id="parent_item" name="parent_item">
+    </div>
+    <div class="form-group">
+        <label for="location">Sijainti (kuvaus): </label>
+        <input type="text" class="form-control" id="location" name="location">
+    </div>
+    <div class="form-group">
+        <label for="dimensions">Mitat: </label>
+        <input type="text" class="form-control" id="dimensions" name="dimensions">
+    </div>
+    <div class="form-group">
+        <label for="year">Vuosi: </label>
+        <input type="integer" class="form-control" id="year" name="year">
+    </div>
+    <div class="form-group">
+        <label for="tags">Tägit (erota välilyönnillä): </label>
+        <input type="text" class="form-control" id="tags" name="tags">
+    </div>
+    <input type="submit" class="btn btn-primary mt-2" value="Luo tavara">
 </form>
+<p>*Sisältävä tavara pitää olla luotu ensin ja sinun pitää olla sen omistaja.</p>
 {% if error %}
 <p class="text-danger">{{error}}</p>
 {% endif %}
