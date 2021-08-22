@@ -92,7 +92,8 @@ def new_item():
 
 @app.route("/search_item")
 def search_item():
-    return render_template("search_item.html")
+    no_of_items = items.get_no_of_items()
+    return render_template("search_item.html", no_of_items=no_of_items)
 
 
 @app.route("/fetch_item")
@@ -101,24 +102,34 @@ def fetch_item():
     result = items.find_by_name(name)
     if result:
         tags = items.get_item_tags(result[0].id)
-        location = items.find_by_id(result[0].id).name
+        location = items.find_by_id(result[0].location_id).name
         return render_template("search_results.html", items=result, tags=[tags], locations=[location])
     else:
-        return render_template("search_item.html", error=1)
+        no_of_items = items.get_no_of_items()
+        return render_template("search_item.html", no_of_items=no_of_items, error=1)
+
+
+@app.route("/fetch_by_tag")
+def fetch_by_tag():
+    tag = request.args["tag"]
+    result = items.find_by_tag(tag)
+    if result:
+        (tags, locations) = items.get_tags_locations(result)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations)
+    else:
+        no_of_items = items.get_no_of_items()
+        return render_template("search_item.html", no_of_items=no_of_items, error=1)
 
 
 @app.route("/fetch_all_items")
 def fetch_all_items():
     result = items.fetch_all_items()
     if result:
-        tags = []
-        locations = []
-        for item in result:
-            tags.append(items.get_item_tags(item.id))
-            locations.append(items.find_by_id(item.id).name)
+        (tags, locations) = items.get_tags_locations(result)
         return render_template("search_results.html", items=result, tags=tags, locations=locations)
     else:
-        return render_template("search_item.html", error=1)
+        no_of_items = items.get_no_of_items()
+        return render_template("search_item.html", no_of_items=no_of_items, error=1)
 
 
 @app.route("/edit_item/<int:id>")

@@ -55,6 +55,13 @@ def find_by_id(id):
     return item
 
 
+def find_by_tag(tag):
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o, tags t WHERE i.id=o.item_id AND i.id=t.item_id AND t.tag=:tag AND o.user_id=:owner_id"
+    items = db.session.execute(
+        sql, {"tag": tag, "owner_id": session["user_id"]}).fetchall()
+    return items
+
+
 def fetch_all_items():
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND o.user_id=:owner_id"
     items = db.session.execute(
@@ -65,4 +72,25 @@ def fetch_all_items():
 def get_item_tags(id):
     sql = "SELECT tag FROM tags WHERE item_id=:item_id"
     tags = db.session.execute(sql, {"item_id": id}).fetchall()
+    print(tags)
     return tags
+
+
+def get_no_of_items():
+    sql = "SELECT COUNT(*) FROM items i, owners o WHERE i.id=o.item_id AND o.user_id=:owner_id"
+    number = db.session.execute(
+        sql, {"owner_id": session["user_id"]}).fetchone()[0]
+    return number
+
+
+def get_tags_locations(result):
+    tags = []
+    locations = []
+    for item in result:
+        tags.append(get_item_tags(item.id))
+        location = find_by_id(item.location_id)
+        if location:
+            locations.append(location.name)
+        else:
+            locations.append('')
+    return (tags, locations)

@@ -2,19 +2,26 @@
 {% extends "layout.html" %}
 {% block pagename %} Etsi tavara {% endblock %}
 {% block content %}
-<p>Sinulla on yhteensä xyz tavaraa.</p>
+<p>Sinulla on yhteensä {{no_of_items}} tavara(a).</p>
 <form action="/fetch_item" method="GET">
     <div class="form-group">
         <label for="name">Tavaran nimi: </label>
         <input type="text" class="form-control" id="name" name="name">
-    </p>
-    <input type="submit" class="btn btn-primary mt-2" value="Etsi tavara">
+        </p>
+        <input type="submit" class="btn btn-primary mt-1 mb-4" value="Etsi tavaran nimellä">
+</form>
+<form action="/fetch_by_tag" method="GET">
+    <div class="form-group">
+        <label for="tag">Tägi: </label>
+        <input type="text" class="form-control" id="tag" name="tag">
+        </p>
+        <input type="submit" class="btn btn-primary mt-1 mb-3" value="Etsi tägillä">
 </form>
 <form action="/fetch_all_items" method="GET">
-    <input type="submit" class="btn btn-primary mt-2" value="Näytä kaikki tavarani">
+    <input type="submit" class="btn btn-primary mt-2 mb-4" value="Näytä kaikki tavarani">
 </form>
 {% if error %}
-<p>Haettua tavaraa ei löytynyt</p>
+<p>Haettua tavaraa ei löytynyt!</p>
 {% endif %}
 {% endblock %}
 {% block notlogged %}
