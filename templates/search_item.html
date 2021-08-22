@@ -4,13 +4,14 @@
 {% block content %}
 <p>Sinulla on yhteensä xyz tavaraa.</p>
 <form action="/fetch_item" method="GET">
-    <p>Tavaran nimi:<br>
-        <input type="text" name="name">
+    <div class="form-group">
+        <label for="name">Tavaran nimi: </label>
+        <input type="text" class="form-control" id="name" name="name">
     </p>
-    <input type="submit" value="Etsi tavara">
+    <input type="submit" class="btn btn-primary mt-2" value="Etsi tavara">
 </form>
 <form action="/fetch_all_items" method="GET">
-    <input type="submit" value="Näytä kaikki tavarani">
+    <input type="submit" class="btn btn-primary mt-2" value="Näytä kaikki tavarani">
 </form>
 {% if error %}
 <p>Haettua tavaraa ei löytynyt</p>

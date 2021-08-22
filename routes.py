@@ -51,6 +51,7 @@ def register():
     else:
         return render_template("create_user.html", error="Käyttäjätunnus on jo käytössä!")
 
+
 @app.route("/add_item")
 def add_item():
     return render_template("add_item.html")
@@ -64,7 +65,7 @@ def new_item():
     dimensions = request.form["dimensions"]
     year = request.form["year"]
     tags = request.form["tags"]
-    if len(name) > 100 or len(name)<1:
+    if len(name) > 100 or len(name) < 1:
         error = 'Nimen pituuden tulee olla 1-100 merkkiä!'
     elif items.find_by_name(name):
         error = 'Sinulla on jo samanniminen tavara!'
@@ -74,7 +75,7 @@ def new_item():
         error = 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
     elif len(dimensions) > 100:
         error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif year and (not year.isnumeric() or int(year)>9999 or int(year)<1):
+    elif year and (not year.isnumeric() or int(year) > 9999 or int(year) < 1):
         error = 'Vuoden tulee olla väliltä 1-9999'
     elif len(dimensions) > 100:
         error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
@@ -99,7 +100,9 @@ def fetch_item():
     name = request.args["name"]
     result = items.find_by_name(name)
     if result:
-        return render_template("search_results.html", items=result)
+        tags = items.get_item_tags(result[0].id)
+        location = items.find_by_id(result[0].id).name
+        return render_template("search_results.html", items=result, tags=[tags], locations=[location])
     else:
         return render_template("search_item.html", error=1)
 
@@ -108,7 +111,12 @@ def fetch_item():
 def fetch_all_items():
     result = items.fetch_all_items()
     if result:
-        return render_template("search_results.html", items=result)
+        tags = []
+        locations = []
+        for item in result:
+            tags.append(items.get_item_tags(item.id))
+            locations.append(items.find_by_id(item.id).name)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations)
     else:
         return render_template("search_item.html", error=1)
 

@@ -8,7 +8,7 @@ def new_item(name, parent_item=None, location=None, dimensions=None, year=None, 
     else:
         year = 0
     if parent_item:
-        parent_id = find_by_name(parent_item).id
+        parent_id = find_by_name(parent_item)[0].id
     else:
         parent_id = None
     try:
@@ -42,21 +42,27 @@ def edit(id, name, location):
 
 
 def find_by_name(name):
-    sql = "SELECT i.id, i.name, i.location FROM items i, owners o WHERE i.id=o.item_id AND i.name=:name AND o.user_id=:owner_id"
-    item = db.session.execute(
-        sql, {"name": name, "owner_id": session["user_id"]}).fetchone()
-    return item
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND i.name=:name AND o.user_id=:owner_id"
+    items = db.session.execute(
+        sql, {"name": name, "owner_id": session["user_id"]}).fetchall()
+    return items
 
 
 def find_by_id(id):
-    sql = "SELECT id, name, location FROM items WHERE id=:id AND owner_id=:owner_id"
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND i.id=:id AND o.user_id=:owner_id"
     item = db.session.execute(
         sql, {"id": id, "owner_id": session["user_id"]}).fetchone()
     return item
 
 
 def fetch_all_items():
-    sql = "SELECT id, name, location FROM items WHERE owner_id=:owner_id"
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND o.user_id=:owner_id"
     items = db.session.execute(
         sql, {"owner_id": session["user_id"]}).fetchall()
     return items
+
+
+def get_item_tags(id):
+    sql = "SELECT tag FROM tags WHERE item_id=:item_id"
+    tags = db.session.execute(sql, {"item_id": id}).fetchall()
+    return tags
