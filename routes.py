@@ -64,18 +64,18 @@ def new_item():
     dimensions = request.form["dimensions"]
     year = request.form["year"]
     tags = request.form["tags"]
-    if len(name) > 100:
-        error = 'Nimi on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
+    if len(name) > 100 or len(name)<1:
+        error = 'Nimen pituuden tulee olla 1-100 merkkiä!'
     elif items.find_by_name(name):
         error = 'Sinulla on jo samanniminen tavara!'
-    elif len(parent_item) > 100 or not items.find_by_name(parent_item):
+    elif len(parent_item) > 100 or (parent_item and not items.find_by_name(parent_item)):
         error = 'Sisältävää tavaraa ei löydy. Tarkista, että kirjoitit sen nimen oikein.'
     elif len(location) > 100:
         error = 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
     elif len(dimensions) > 100:
         error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif year>9999 or year<0:
-        error = 'Vuoden tulee olla väliltä 0-9999'
+    elif year and (not year.isnumeric() or int(year)>9999 or int(year)<1):
+        error = 'Vuoden tulee olla väliltä 1-9999'
     elif len(dimensions) > 100:
         error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
     elif len(tags) > 100:

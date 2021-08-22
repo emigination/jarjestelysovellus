@@ -8,7 +8,8 @@
         <input type="text" class="form-control" id="name" name="name">
     </div>
     <div class="form-group">
-        <label for="parent_item">Sisältävä tavara (tavaran nimi)*: </label>
+        <label for="parent_item">Sisältävä tavara (tavaran nimi; sisältävä tavara pitää olla luotu ensin ja sinun pitää
+            olla sen omistaja): </label>
         <input type="text" class="form-control" id="parent_item" name="parent_item">
     </div>
     <div class="form-group">
@@ -29,7 +30,6 @@
     </div>
     <input type="submit" class="btn btn-primary mt-2" value="Luo tavara">
 </form>
-<p>*Sisältävä tavara pitää olla luotu ensin ja sinun pitää olla sen omistaja.</p>
 {% if error %}
 <p class="text-danger">{{error}}</p>
 {% endif %}
