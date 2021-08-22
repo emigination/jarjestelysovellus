@@ -3,13 +3,32 @@
 {% block pagename %} Muokkaa tavaraa {% endblock %}
 {% block content %}
 <form action="/update_item/{{item.id}}" method="POST">
-    <p>Tavaran nimi:<br>
-        <input type="text" name="name" value="{{item.name}}">
-    </p>
-    <p>Sijainti:<br>
-        <input type="text" name="location" value="{{item.location}}">
-    </p><br>
-    <input type="submit" value="Tallenna muutokset">
+    <div class="form-group">
+        <label for="name">Tavaran nimi: </label>
+        <input type="text" class="form-control" id="name" name="name" value={{item.name}}>
+    </div>
+    <div class="form-group">
+        <label for="parent_item">Sisältävä tavara (tavaran nimi; sisältävä tavara pitää olla olemassa ja sinun pitää
+            olla sen omistaja): </label>
+        <input type="text" class="form-control" id="parent_item" name="parent_item" value={{location}}>
+    </div>
+    <div class="form-group">
+        <label for="location">Sijainti (kuvaus): </label>
+        <input type="text" class="form-control" id="location" name="location" value={{item.location}}>
+    </div>
+    <div class="form-group">
+        <label for="dimensions">Mitat: </label>
+        <input type="text" class="form-control" id="dimensions" name="dimensions" value={{item.dimensions}}>
+    </div>
+    <div class="form-group">
+        <label for="year">Vuosi: </label>
+        <input type="integer" class="form-control" id="year" name="year" {% if item.year>0 %}value={{item.year}}{% endif %}>
+    </div>
+    <div class="form-group">
+        <label for="tags">Tägit (erota välilyönnillä): </label>
+        <input type="text" class="form-control" id="tags" name="tags" value="{{tag_string}}">
+    </div>
+    <input type="submit" class="btn btn-primary mt-2 mb-2" value="Päivitä tavara">
 </form>
 {% if error %}
 <p>{{error}}</p>

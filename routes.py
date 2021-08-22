@@ -65,29 +65,14 @@ def new_item():
     dimensions = request.form["dimensions"]
     year = request.form["year"]
     tags = request.form["tags"]
-    if len(name) > 100 or len(name) < 1:
-        error = 'Nimen pituuden tulee olla 1-100 merkkiä!'
-    elif items.find_by_name(name):
-        error = 'Sinulla on jo samanniminen tavara!'
-    elif len(parent_item) > 100 or (parent_item and not items.find_by_name(parent_item)):
-        error = 'Sisältävää tavaraa ei löydy. Tarkista, että kirjoitit sen nimen oikein.'
-    elif len(location) > 100:
-        error = 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif len(dimensions) > 100:
-        error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif year and (not year.isnumeric() or int(year) > 9999 or int(year) < 1):
-        error = 'Vuoden tulee olla väliltä 1-9999'
-    elif len(dimensions) > 100:
-        error = 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif len(tags) > 100:
-        error = 'Tägien yhteispituus saa olla enintään 100 merkkiä.'
-    elif len(tags) > 100:
-        error = 'Tägien yhteispituus saa olla enintään 100 merkkiä.'
+    error = items.check_input(
+        name, parent_item, location, dimensions, year, tags)
+    if error:
+        return render_template("add_item.html", error=error)
     elif items.new_item(name, parent_item, location, dimensions, year, tags):
         return render_template("success.html", title="Lisää tavara", action="Tavaran lisäys")
     else:
-        error = 'Epäonnistui :('
-    return render_template("add_item.html", error=error)
+        return render_template("add_item.html", error='Epäonnistui :(')
 
 
 @app.route("/search_item")
@@ -114,7 +99,7 @@ def fetch_by_tag():
     tag = request.args["tag"]
     result = items.find_by_tag(tag)
     if result:
-        (tags, locations) = items.get_tags_locations(result)
+        (locations, tags) = items.get_tags_locations(result)
         return render_template("search_results.html", items=result, tags=tags, locations=locations)
     else:
         no_of_items = items.get_no_of_items()
@@ -125,7 +110,7 @@ def fetch_by_tag():
 def fetch_all_items():
     result = items.fetch_all_items()
     if result:
-        (tags, locations) = items.get_tags_locations(result)
+        (locations, tags) = items.get_tags_locations(result)
         return render_template("search_results.html", items=result, tags=tags, locations=locations)
     else:
         no_of_items = items.get_no_of_items()
@@ -134,21 +119,32 @@ def fetch_all_items():
 
 @app.route("/edit_item/<int:id>")
 def edit_item(id):
-    item = items.find_by_id(id)
-    return render_template("edit_item.html", item=item)
+    (item, tags, location) = items.get_all_by_id(id)
+    print('tags: ', tags)
+    return render_template("edit_item.html", item=item, location=location, tag_string=tags)
 
 
 @app.route("/update_item/<int:id>", methods=["POST"], )
 def update_item(id):
     name = request.form["name"]
+    parent_item = request.form["parent_item"]
     location = request.form["location"]
-    if len(name) > 100:
-        error = 'Nimi on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif len(location) > 100:
-        error = 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif items.edit(id, name, location):
-        return render_template("success.html", title="Muokkaa tavaraa", action="Tavaran muokkaus")
-    else:
-        error = 'Epäonnistui :('
-    item = items.find_by_id(id)
-    return render_template("edit_item.html", item=item, error=error)
+    dimensions = request.form["dimensions"]
+    year = request.form["year"]
+    tags = request.form["tags"]
+    error = items.check_input(
+        name, parent_item, location, dimensions, year, tags, id)
+    if not error:
+        if items.edit(id, name, parent_item, location, dimensions, year, tags):
+            return render_template("success.html", title="Muokkaa tavaraa", action="Tavaran muokkaus")
+        else:
+            error = 'Epäonnistui :('
+    (item, tagstring, location) = items.get_all_by_id(id)
+    return render_template("edit_item.html", item=item, location=location, tag_string=tagstring, error=error)
+
+    # elif items.edit(id, name, location):
+    #     return render_template("success.html", title="Muokkaa tavaraa", action="Tavaran muokkaus")
+    # else:
+    #     error = 'Epäonnistui :('
+    # item = items.find_by_id(id)
+    # return render_template("edit_item.html", item=item, error=error)
