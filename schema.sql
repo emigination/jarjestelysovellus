@@ -13,16 +13,16 @@ CREATE TABLE items (
 );
 CREATE TABLE owners (
     id SERIAL PRIMARY KEY,
-    item_id INTEGER REFERENCES items,
-    user_id INTEGER REFERENCES users
+    item_id INTEGER REFERENCES items ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users ON DELETE CASCADE
 );
 CREATE TABLE viewers (
     id SERIAL PRIMARY KEY,
-    item_id INTEGER REFERENCES items,
-    user_id INTEGER REFERENCES users
+    item_id INTEGER REFERENCES items ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users ON DELETE CASCADE
 );
 CREATE TABLE tags (
     id SERIAL PRIMARY KEY,
     tag TEXT,
-    item_id INTEGER REFERENCES items
+    item_id INTEGER REFERENCES items ON DELETE CASCADE
 );

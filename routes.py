@@ -120,11 +120,10 @@ def fetch_all_items():
 @app.route("/edit_item/<int:id>")
 def edit_item(id):
     (item, tags, location) = items.get_all_by_id(id)
-    print('tags: ', tags)
     return render_template("edit_item.html", item=item, location=location, tag_string=tags)
 
 
-@app.route("/update_item/<int:id>", methods=["POST"], )
+@app.route("/update_item/<int:id>", methods=["POST"])
 def update_item(id):
     name = request.form["name"]
     parent_item = request.form["parent_item"]
@@ -142,9 +141,16 @@ def update_item(id):
     (item, tagstring, location) = items.get_all_by_id(id)
     return render_template("edit_item.html", item=item, location=location, tag_string=tagstring, error=error)
 
-    # elif items.edit(id, name, location):
-    #     return render_template("success.html", title="Muokkaa tavaraa", action="Tavaran muokkaus")
-    # else:
-    #     error = 'Epäonnistui :('
-    # item = items.find_by_id(id)
-    # return render_template("edit_item.html", item=item, error=error)
+
+@app.route("/delete_item/<int:id>")
+def delete_item(id):
+    item = items.find_by_id(id)
+    return render_template("delete_item.html", item=item)
+
+
+@app.route("/delete/<int:id>", methods=["POST"])
+def delete(id):
+    if items.delete_item(id):
+        return render_template("success.html", title="Poista tavara", action="Tavaran poistaminen")
+    no_of_items = items.get_no_of_items()
+    return render_template("search_item.html", no_of_items=no_of_items)

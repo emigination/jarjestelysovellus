@@ -25,7 +25,6 @@ def new_item(name, parent_item=None, location=None, dimensions=None, year=None, 
                 db.session.execute(sql, {"tag": tag, "item_id": item_id})
         db.session.commit()
     except Exception as e:
-        print('virhe:', e)
         return False
     return True
 
@@ -33,7 +32,6 @@ def new_item(name, parent_item=None, location=None, dimensions=None, year=None, 
 def edit(id, name, parent_item, location, dimensions, year, tags):
     sql = "SELECT user_id FROM owners WHERE item_id=:id"
     if db.session.execute(sql, {"id": id}).fetchone().user_id != session["user_id"]:
-        print('asfdafdafdsaf   ' + db.session.execute(sql, {"id": id}).fetchone())
         return
     if year.isnumeric():
         year = int(year)
@@ -56,8 +54,6 @@ def edit(id, name, parent_item, location, dimensions, year, tags):
                 db.session.execute(sql, {"tag": tag, "item_id": id})
         db.session.commit()
     except Exception as e:
-        print('virhe')
-        print(e)
         return False
     return True
 
@@ -125,7 +121,6 @@ def get_all_by_id(id):
     tags = ''
     for tag in get_item_tags(id):
         tags += tag.tag + ' '
-    print('tägit' + tags)
     return (item, tags, location)
 
 
@@ -148,3 +143,15 @@ def check_input(name, parent_item, location, dimensions, year, tags, id=None):
     elif len(tags) > 100:
         return 'Tägien yhteispituus saa olla enintään 100 merkkiä.'
     return
+
+def delete_item(id):
+    sql = "SELECT user_id FROM owners WHERE item_id=:id"
+    if db.session.execute(sql, {"id": id}).fetchone().user_id != session["user_id"]:
+        return False
+    try:
+        sql = "DELETE FROM items WHERE id=:id"
+        db.session.execute(sql, {"id": id})
+        db.session.commit()
+    except Exception as e:
+        return False
+    return True

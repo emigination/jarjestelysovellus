@@ -13,6 +13,9 @@
     <form action="/edit_item/{{item.id}}" method="GET">
         <input type="submit" class="btn btn-primary mt-2" value="Muokkaa">
     </form>
+    <form action="/delete_item/{{item.id}}" method="GET">
+        <input type="submit" class="btn btn-primary mt-2" value="Poista">
+    </form>
 <br>
 <br>
 {% endfor %}
