@@ -6,14 +6,15 @@ Sovelluksen päätarkoitus on erilaisten tavaroiden sijainneista kirjanpitämine
 
 ## Toiminnallisuudet
 
-Tällä hetkellä sovelluksessa voi luoda käyttäjätilin, lisätä esineitä, hakea omia esineitä nimen perusteella tai listata ne kaikki.
+
+* Kun esine luodaan sovellukssssa, sille voi antaa erilaisia ominaisuuksia, kuten koko, ikä sekä vuodenaika
+* Esineelle voi myös kertoa säilytyspaikan, joka voi olla toisen esineen sisällä ja/tai muuten vapaasti kuvailtuna
+* Esine voi sisältää toisia esineitä, joiden sisällä on myös esineitä
+* Esineitä voi merkitä tägeillä. Yhdellä esineellä voi olla useampia tägejä ja sama tägi voi luonnollisesti olla monella esineellä.
+* Esineitä voi hakea nimen tai tägin perusteella
+* Käyttäjä voi nähdä kaikki tavaransa
 
 ### Suunnitelmissa olevat toiminnallisuudet
-
-* Kun esine luodaan sovellukssssa, sille voidaan antaa erilaisia ominaisuuksia, kuten koko, ikä sekä vuodenaika, johon se liittyy
-* Esineelle voidaan myös kertoa säilytyspaikka, joka voi olla toisen esineen sisällä ja/tai muuten vapaasti kuvailtuna
-* Esine voi sisältää toisia esineitä, joiden sisällä on myös esineitä
-* Esineillä voi olla eri omistajia
-* Esineitä voidaan merkitä tägeillä. Yhdellä esineellä voi olla useampia tägejä ja sama tägi voi luonnollisesti olla monella esineellä.
-* Esineitä voidaan hakea ainakin nimen, sijainnin tai tägin perusteella
 * Käyttäjät voivat jakaa esineitä toistensa kanssa niin, että esimerkiksi monen ihmisen käytössä olevan huoneen tai komeron sisältö on kaikkien käyttäjien katsottavissa ja/tai muokattavissa ja järjesteltävissä
+* Esineitä voi hakea sijainnin perusteella
+* Hakutuloksissa tägit ja toisiin tavaroihin viittaavat sijainnit toimivat linkkeinä
