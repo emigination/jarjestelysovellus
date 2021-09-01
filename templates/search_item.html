@@ -7,21 +7,28 @@
     <div class="form-group">
         <label for="name">Tavaran nimi: </label>
         <input type="text" class="form-control" id="name" name="name">
-        </p>
         <input type="submit" class="btn btn-primary mt-1 mb-4" value="Etsi tavaran nimellä">
 </form>
+<br>
 <form action="/fetch_by_tag" method="GET">
     <div class="form-group">
         <label for="tag">Tägi: </label>
         <input type="text" class="form-control" id="tag" name="tag">
-        </p>
         <input type="submit" class="btn btn-primary mt-1 mb-3" value="Etsi tägillä">
 </form>
+<br>
+<form action="/fetch_contents" method="GET">
+    <div class="form-group">
+        <label for="container">Sisältävän tavaran nimi: </label>
+        <input type="text" class="form-control" id="container" name="container">
+        <input type="submit" class="btn btn-primary mt-1 mb-3" value="Etsi sijainnin mukaan">
+</form>
+<br>
 <form action="/fetch_all_items" method="GET">
     <input type="submit" class="btn btn-primary mt-2 mb-4" value="Näytä kaikki tavarani">
 </form>
 {% if error %}
-<p>Haettua tavaraa ei löytynyt!</p>
+<p>{{error}}</p>
 {% endif %}
 {% endblock %}
 {% block notlogged %}

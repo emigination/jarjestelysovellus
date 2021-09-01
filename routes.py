@@ -1,3 +1,4 @@
+from os import error
 from flask import Flask, render_template, session, redirect, request
 from app import app
 import users
@@ -91,7 +92,7 @@ def fetch_item():
         return render_template("search_results.html", items=result, tags=[tags], locations=[location])
     else:
         no_of_items = items.get_no_of_items()
-        return render_template("search_item.html", no_of_items=no_of_items, error=1)
+        return render_template("search_item.html", no_of_items=no_of_items, error='Hakemaasi tavaraa ei löydy!')
 
 
 @app.route("/fetch_by_tag")
@@ -103,7 +104,23 @@ def fetch_by_tag():
         return render_template("search_results.html", items=result, tags=tags, locations=locations)
     else:
         no_of_items = items.get_no_of_items()
-        return render_template("search_item.html", no_of_items=no_of_items, error=1)
+        return render_template("search_item.html", no_of_items=no_of_items, error='Tägillä ei löydy yhtään tavara!')
+
+
+@app.route("/fetch_contents")
+def fetch_contents():
+    container = request.args["container"]
+    result = items.find_by_container(container)
+    if result:
+        if result == 'no container':
+            error = 'Tavaraa, jonka sisältöä haet, ei löydy!'
+        else:
+            (locations, tags) = items.get_tags_locations(result)
+            return render_template("search_results.html", items=result, tags=tags, locations=locations)
+    else:
+        error='Haettua tavaraa ei löytynyt!'
+    no_of_items = items.get_no_of_items()
+    return render_template("search_item.html", no_of_items=no_of_items, error=error)
 
 
 @app.route("/fetch_all_items")
