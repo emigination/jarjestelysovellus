@@ -129,20 +129,20 @@ def check_input(name, parent_item, location, dimensions, year, tags, id=None):
         return 'Nimen pituuden tulee olla 1-100 merkkiä.'
     else:
         samenameitem = find_by_name(name)
-    if samenameitem:
-        if (id and samenameitem[0].id != id) or not id:
-            return 'Sinulla on jo samanniminen tavara!'
-    elif len(parent_item) > 100 or (parent_item and not find_by_name(parent_item)):
+    if samenameitem and ((id and samenameitem[0].id != id) or not id):
+        return 'Sinulla on jo samanniminen tavara!'
+    if len(parent_item) > 100 or (parent_item and not find_by_name(parent_item)):
         return 'Sisältävää tavaraa ei löydy. Tarkista, että kirjoitit sen nimen oikein.'
-    elif len(location) > 100:
+    if len(location) > 100:
         return 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif len(dimensions) > 100:
+    if len(dimensions) > 100:
         return 'Mittojen kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
-    elif year and (not year.isnumeric() or int(year) > 9999 or int(year) < 1):
+    if year and (not year.isnumeric() or int(year) > 9999 or int(year) < 1):
         return 'Vuoden tulee olla väliltä 1-9999'
-    elif len(tags) > 100:
+    if len(tags) > 100:
         return 'Tägien yhteispituus saa olla enintään 100 merkkiä.'
     return
+
 
 def delete_item(id):
     sql = "SELECT user_id FROM owners WHERE item_id=:id"

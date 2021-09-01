@@ -10,11 +10,9 @@
     Vuosi: {% if item.year>0 %}{{item.year}}{% endif %}<br>
     Tägit: {% for tag in tags[loop.index-1] %} {{tag.tag}} {% endfor %}
 </p>
-    <form action="/edit_item/{{item.id}}" method="GET">
-        <input type="submit" class="btn btn-primary mt-2" value="Muokkaa">
-    </form>
-    <form action="/delete_item/{{item.id}}" method="GET">
-        <input type="submit" class="btn btn-primary mt-2" value="Poista">
+    <form>
+        <button type="submit" formaction="/edit_item/{{item.id}}" method="GET" class="btn btn-primary mt-2">Muokkaa</button>
+        <button type="submit" formaction="/delete_item/{{item.id}}" method="GET" class="btn btn-primary mt-2">Poista</button>
     </form>
 <br>
 <br>
