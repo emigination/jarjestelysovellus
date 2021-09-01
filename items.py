@@ -79,11 +79,11 @@ def find_by_tag(tag):
     return items
 
 
-def find_by_container(container):
-    container = find_by_name(container)
-    if not container:
-        return 'no container'
-    container_id = container[0].id
+def find_by_container(container_id):
+    # container = find_by_name(container)
+    # if not container:
+    #     return 'no container'
+    # container_id = container[0].id
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND i.location_id=:container_id AND o.user_id=:owner_id ORDER BY i.name"
     items = db.session.execute(
         sql, {"container_id": container_id, "owner_id": session["user_id"]}).fetchall()
@@ -117,9 +117,9 @@ def get_tags_locations(result):
         tags.append(get_item_tags(item.id))
         location = find_by_id(item.location_id)
         if location:
-            locations.append(location.name)
+            locations.append((location.id, location.name))
         else:
-            locations.append('')
+            locations.append(('',''))
     return (locations, tags)
 
 

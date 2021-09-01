@@ -5,10 +5,10 @@
 {% for item in items %}
 <p>
     Tavara: {{item.name}}<br>
-    Sijainti: {% if locations[loop.index-1] is defined %}{{locations[loop.index-1]}}{% endif %} - {{item.location}}<br>
+    Sijainti: {% if locations[loop.index-1] is defined %}<a href="/fetch_contents/{{locations[loop.index-1][0]}}">{{locations[loop.index-1][1]}}</a>{% endif %} - {{item.location}}<br>
     Mitat: {{item.dimensions}}<br>
     Vuosi: {% if item.year>0 %}{{item.year}}{% endif %}<br>
-    Tägit: {% for tag in tags[loop.index-1] %} {{tag.tag}} {% endfor %}
+    Tägit: {% for tag in tags[loop.index-1] %}<a href="/fetch_by_tag_name/{{tag.tag}}">{{tag.tag}}</a>{% endfor %}
 </p>
     <form>
         <button type="submit" formaction="/edit_item/{{item.id}}" method="GET" class="btn btn-primary mt-2">Muokkaa</button>

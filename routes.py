@@ -88,7 +88,9 @@ def fetch_item():
     result = items.find_by_name(name)
     if result:
         tags = items.get_item_tags(result[0].id)
-        location = items.find_by_id(result[0].location_id).name
+        location = items.find_by_id(result[0].location_id)
+        if location:
+            location = (location.id, location.name)
         return render_template("search_results.html", items=result, tags=[tags], locations=[location])
     else:
         no_of_items = items.get_no_of_items()
@@ -107,20 +109,41 @@ def fetch_by_tag():
         return render_template("search_item.html", no_of_items=no_of_items, error='Tägillä ei löydy yhtään tavara!')
 
 
-@app.route("/fetch_contents")
-def fetch_contents():
-    container = request.args["container"]
-    result = items.find_by_container(container)
+@app.route("/fetch_by_tag_name/<string:tag>")
+def fetch_by_tag_name(tag):
+    result = items.find_by_tag(tag)
     if result:
-        if result == 'no container':
-            error = 'Tavaraa, jonka sisältöä haet, ei löydy!'
-        else:
+        (locations, tags) = items.get_tags_locations(result)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations)
+    else:
+        no_of_items = items.get_no_of_items()
+        return render_template("search_item.html", no_of_items=no_of_items, error='Tägillä ei löydy yhtään tavara!')
+
+
+@app.route("/fetch_contents_by_name")
+def fetch_contents_by_name():
+    container = items.find_by_name(request.args["container"])
+    if not container:
+        error = 'Tavaraa, jonka sisältöä haet, ei löydy!'
+    else:
+        container_id = container[0].id
+        result = items.find_by_container(container_id)
+        if result:
             (locations, tags) = items.get_tags_locations(result)
             return render_template("search_results.html", items=result, tags=tags, locations=locations)
-    else:
-        error='Haettua tavaraa ei löytynyt!'
+        error = f'"{container[0].name}" ei sisällä yhtään tavaraa.'
     no_of_items = items.get_no_of_items()
     return render_template("search_item.html", no_of_items=no_of_items, error=error)
+
+
+@app.route("/fetch_contents/<int:id>")
+def fetch_contents(id):
+    result = items.find_by_container(id)
+    if result:
+        (locations, tags) = items.get_tags_locations(result)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations)
+    no_of_items = items.get_no_of_items()
+    return render_template("search_item.html", no_of_items=no_of_items, error='Haettua tavaraa ei löytynyt!')
 
 
 @app.route("/fetch_all_items")
