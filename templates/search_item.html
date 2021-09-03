@@ -3,7 +3,7 @@
 {% block pagename %} Etsi tavara {% endblock %}
 {% block content %}
 <p>Sinulla on yhteensä {{no_of_items}} tavara(a).</p>
-<form action="/fetch_item" method="GET">
+<form action="/fetch_by_name" method="GET">
     <div class="form-group">
         <label for="name">Tavaran nimi: </label>
         <input type="text" class="form-control" id="name" name="name">

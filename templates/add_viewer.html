@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+{% block pagename %} Lisää katseloikeus {% endblock %}
+{% block content %}
+<form action="/new_viewer" method="POST">
+    <div class="form-group">
+        <label for="username">Käyttäjätunnus, jolle haluat antaa katseluoikeuden tavaraan {{item_name}}: </label>
+        <input type="text" class="form-control" id="username" name="username">
+    </div>
+    <input type="hidden" name="item_id" value="{{item_id}}">
+    <input type="hidden" name="item_name" value="{{item_name}}">
+    <input type="submit" class="btn btn-primary mt-2 mb-2" value="Anna katseluoikeus">
+</form>
+{% if error %}
+<p class="text-danger">{{error}}</p>
+{% endif %}
+{% endblock %}
+{% block notlogged %}
+<p>Sinun pitää <a href="/">kirjautua sisään</a> tai <a href="/create_user">luoda käyttäjätili</a>!</p>
+{% endblock %}

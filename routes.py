@@ -82,8 +82,8 @@ def search_item():
     return render_template("search_item.html", no_of_items=no_of_items)
 
 
-@app.route("/fetch_item")
-def fetch_item():
+@app.route("/fetch_by_name")
+def fetch_by_name():
     name = request.args["name"]
     result = items.find_by_name(name)
     if result:
@@ -102,8 +102,8 @@ def fetch_by_tag():
     tag = request.args["tag"]
     result = items.find_by_tag(tag)
     if result:
-        (locations, tags) = items.get_tags_locations(result)
-        return render_template("search_results.html", items=result, tags=tags, locations=locations)
+        (locations, tags, no_of_contents) = items.get_tags_locations_contents(result)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations, contents=no_of_contents)
     else:
         no_of_items = items.get_no_of_items()
         return render_template("search_item.html", no_of_items=no_of_items, error='Tägillä ei löydy yhtään tavara!')
@@ -113,8 +113,8 @@ def fetch_by_tag():
 def fetch_by_tag_name(tag):
     result = items.find_by_tag(tag)
     if result:
-        (locations, tags) = items.get_tags_locations(result)
-        return render_template("search_results.html", items=result, tags=tags, locations=locations)
+        (locations, tags, no_of_contents) = items.get_tags_locations_contents(result)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations, contents=no_of_contents)
     else:
         no_of_items = items.get_no_of_items()
         return render_template("search_item.html", no_of_items=no_of_items, error='Tägillä ei löydy yhtään tavara!')
@@ -129,8 +129,8 @@ def fetch_contents_by_name():
         container_id = container[0].id
         result = items.find_by_container(container_id)
         if result:
-            (locations, tags) = items.get_tags_locations(result)
-            return render_template("search_results.html", items=result, tags=tags, locations=locations)
+            (locations, tags, no_of_contents) = items.get_tags_locations_contents(result)
+            return render_template("search_results.html", items=result, tags=tags, locations=locations, contents=no_of_contents)
         error = f'"{container[0].name}" ei sisällä yhtään tavaraa.'
     no_of_items = items.get_no_of_items()
     return render_template("search_item.html", no_of_items=no_of_items, error=error)
@@ -140,8 +140,8 @@ def fetch_contents_by_name():
 def fetch_contents(id):
     result = items.find_by_container(id)
     if result:
-        (locations, tags) = items.get_tags_locations(result)
-        return render_template("search_results.html", items=result, tags=tags, locations=locations)
+        (locations, tags, no_of_contents) = items.get_tags_locations_contents(result)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations, contents=no_of_contents)
     no_of_items = items.get_no_of_items()
     return render_template("search_item.html", no_of_items=no_of_items, error='Haettua tavaraa ei löytynyt!')
 
@@ -150,8 +150,8 @@ def fetch_contents(id):
 def fetch_all_items():
     result = items.fetch_all_items()
     if result:
-        (locations, tags) = items.get_tags_locations(result)
-        return render_template("search_results.html", items=result, tags=tags, locations=locations)
+        (locations, tags, no_of_contents) = items.get_tags_locations_contents(result)
+        return render_template("search_results.html", items=result, tags=tags, locations=locations, contents=no_of_contents)
     else:
         no_of_items = items.get_no_of_items()
         return render_template("search_item.html", no_of_items=no_of_items, error=1)
@@ -159,8 +159,8 @@ def fetch_all_items():
 
 @app.route("/edit_item/<int:id>")
 def edit_item(id):
-    (item, tags, location) = items.get_all_by_id(id)
-    return render_template("edit_item.html", item=item, location=location, tag_string=tags)
+    (item, tagstring, location) = items.get_all_by_id(id)
+    return render_template("edit_item.html", item=item, location=location, tag_string=tagstring)
 
 
 @app.route("/update_item/<int:id>", methods=["POST"])
@@ -180,6 +180,28 @@ def update_item(id):
             error = 'Epäonnistui :('
     (item, tagstring, location) = items.get_all_by_id(id)
     return render_template("edit_item.html", item=item, location=location, tag_string=tagstring, error=error)
+
+
+@app.route("/add_viewer/<int:id>")
+def add_viewer(id):
+    item_name = items.find_by_id(id).name
+    return render_template("add_viewer.html", item_id=id, item_name=item_name)
+
+
+@app.route("/new_viewer", methods=["POST"])
+def new_viewer():
+    username = request.form["username"]
+    item_name = request.form["item_name"]
+    item_id = request.form["item_id"]
+    user = users.fetch_user(username)
+    if not user:
+        error = f'Käyttäjää {username} ei löydy!'
+    else:
+        result = items.add_viewer(item_id, user.id)
+        if result == 'success':
+            return render_template("success.html", title="Lisää katseluoikeus", action="Katseluoikeuden lisääminen")
+        error = result
+    return render_template("add_viewer.html", item_id=item_id, item_name=item_name, error=error)
 
 
 @app.route("/delete_item/<int:id>")

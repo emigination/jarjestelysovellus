@@ -80,10 +80,6 @@ def find_by_tag(tag):
 
 
 def find_by_container(container_id):
-    # container = find_by_name(container)
-    # if not container:
-    #     return 'no container'
-    # container_id = container[0].id
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND i.location_id=:container_id AND o.user_id=:owner_id ORDER BY i.name"
     items = db.session.execute(
         sql, {"container_id": container_id, "owner_id": session["user_id"]}).fetchall()
@@ -110,9 +106,10 @@ def get_no_of_items():
     return number
 
 
-def get_tags_locations(result):
+def get_tags_locations_contents(result):
     tags = []
     locations = []
+    contents = []
     for item in result:
         tags.append(get_item_tags(item.id))
         location = find_by_id(item.location_id)
@@ -120,7 +117,9 @@ def get_tags_locations(result):
             locations.append((location.id, location.name))
         else:
             locations.append(('',''))
-    return (locations, tags)
+        no_of_contents = get_no_of_contents(item.id)
+        contents.append(no_of_contents)
+    return (locations, tags, contents)
 
 
 def get_all_by_id(id):
@@ -129,10 +128,17 @@ def get_all_by_id(id):
         location = find_by_id(item.location_id).name
     else:
         location = ''
-    tags = ''
+    tagstring = ''
     for tag in get_item_tags(id):
-        tags += tag.tag + ' '
-    return (item, tags, location)
+        tagstring += tag.tag + ' '
+    return (item, tagstring, location)
+
+
+def get_no_of_contents(id):
+    sql = "SELECT COUNT(*) FROM items i, owners o WHERE i.id=o.item_id AND i.location_id=:id AND o.user_id=:owner_id"
+    number = db.session.execute(
+        sql, {"id": id, "owner_id": session["user_id"]}).fetchone()[0]
+    return number
 
 
 def check_input(name, parent_item, location, dimensions, year, tags, id=None):
@@ -156,9 +162,11 @@ def check_input(name, parent_item, location, dimensions, year, tags, id=None):
 
 
 def delete_item(id):
-    sql = "SELECT user_id FROM owners WHERE item_id=:id"
-    if db.session.execute(sql, {"id": id}).fetchone().user_id != session["user_id"]:
+    if not user_is_owner(id):
         return False
+    # sql = "SELECT user_id FROM owners WHERE item_id=:id"
+    # if db.session.execute(sql, {"id": id}).fetchone().user_id != session["user_id"]:
+    #     return False
     try:
         sql = "DELETE FROM items WHERE id=:id"
         db.session.execute(sql, {"id": id})
@@ -166,3 +174,27 @@ def delete_item(id):
     except Exception as e:
         return False
     return True
+
+
+def add_viewer(item_id, user_id):
+    if not user_is_owner(item_id):
+        return False
+    sql = "SELECT COUNT(*) FROM viewers WHERE item_id=:item_id AND user_id=:user_id"
+    already_exists = db.session.execute(sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
+    if already_exists:
+        return 'Käyttäjällä on jo katseluoikeus tavaraan!'
+    sql = "INSERT INTO viewers (item_id,user_id) VALUES (:item_id,:user_id)"
+    try:
+        db.session.execute(sql, {"item_id": item_id, "user_id": user_id})
+        db.session.commit()
+    except Exception as e:
+        return 'Epäonnistui :('
+    return 'success'
+
+
+def user_is_owner(item_id):
+    sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"
+    is_owner = db.session.execute(sql, {"item_id": item_id, "user_id": session["user_id"]}).fetchone()[0]
+    if is_owner:
+        return True
+    return False
