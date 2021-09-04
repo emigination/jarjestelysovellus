@@ -1,5 +1,6 @@
 from os import error
 from flask import Flask, render_template, session, redirect, request
+from secrets import token_hex
 from app import app
 import users
 import items
@@ -21,6 +22,7 @@ def login():
     if not error:
         session["name"] = name
         session["user_id"] = users.fetch_user(name).id
+        session["csrf_token"] = token_hex(16)
         return redirect("/")
     else:
         return render_template("index.html", error=1)
@@ -48,6 +50,7 @@ def register():
     if users.create_user(name, password):
         session["name"] = name
         session["user_id"] = users.fetch_user(name).id
+        session["csrf_token"] = token_hex(16)
         return render_template("success.html", title="Luo uusi käyttäjä", action="Käyttäjätunnuksen luonti")
     else:
         return render_template("create_user.html", error="Käyttäjätunnus on jo käytössä!")
@@ -60,6 +63,8 @@ def add_item():
 
 @app.route("/new_item", methods=["POST"])
 def new_item():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        return
     name = request.form["name"]
     parent_item = request.form["parent_item"]
     location = request.form["location"]
@@ -162,6 +167,8 @@ def edit_item(id):
 
 @app.route("/update_item/<int:id>", methods=["POST"])
 def update_item(id):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        return
     name = request.form["name"]
     parent_item = request.form["parent_item"]
     location = request.form["location"]
@@ -197,6 +204,8 @@ def add_owner(id):
 
 @app.route("/new_viewer", methods=["POST"])
 def new_viewer():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        return
     username = request.form["username"]
     item_name = request.form["item_name"]
     item_id = request.form["item_id"]
@@ -213,6 +222,8 @@ def new_viewer():
 
 @app.route("/new_owner", methods=["POST"])
 def new_owner():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        return
     username = request.form["username"]
     item_name = request.form["item_name"]
     item_id = request.form["item_id"]
@@ -235,6 +246,8 @@ def delete_item(id):
 
 @app.route("/delete/<int:id>", methods=["POST"])
 def delete(id):
+    if session["csrf_token"] != request.form["csrf_token"]:
+        return
     if items.delete_item(id):
         return render_template("success.html", title="Poista tavara", action="Tavaran poistaminen")
     no_of_items = items.get_no_of_items()

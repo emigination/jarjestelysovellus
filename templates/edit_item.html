@@ -28,6 +28,7 @@
         <label for="tags">Tägit (erota välilyönnillä): </label>
         <input type="text" class="form-control" id="tags" name="tags" value="{{tag_string}}">
     </div>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <input type="submit" class="btn btn-primary mt-2 mb-2" value="Päivitä tavara">
 </form>
 {% if error %}

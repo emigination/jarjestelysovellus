@@ -1,3 +1,4 @@
+from os import get_terminal_size
 from flask import session
 from db import db
 
@@ -148,7 +149,7 @@ def get_no_of_contents(id):
 def get_all_by_id(id):
     item = find_by_id(id)
     if item.location_id:
-        location = find_by_id(item.location_id).name
+        location = get_name(item.location_id)
     else:
         location = ''
     tagstring = ''
@@ -164,7 +165,7 @@ def check_input(name, parent_item, location, dimensions, year, tags, id=None):
         samenameitem = find_by_name(name)
     if samenameitem and ((id and samenameitem[0].id != id) or not id):
         return 'Sinulla on jo samanniminen tavara!'
-    if len(parent_item) > 100 or (parent_item and not find_by_name(parent_item)):
+    if not (id and location==get_all_by_id(id)[2]) and (len(parent_item) > 100 or (parent_item and not find_by_name(parent_item))):
         return 'Sisältävää tavaraa ei löydy. Tarkista, että kirjoitit sen nimen oikein.'
     if len(location) > 100:
         return 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'

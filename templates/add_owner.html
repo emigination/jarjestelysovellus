@@ -10,6 +10,7 @@
     </div>
     <input type="hidden" name="item_id" value="{{item_id}}">
     <input type="hidden" name="item_name" value="{{item_name}}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <input type="submit" class="btn btn-primary mt-2 mb-2" value="Tee omistajaksi">
 </form>
 {% if error %}
