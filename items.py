@@ -1,4 +1,3 @@
-from os import get_terminal_size
 from flask import session
 from db import db
 
@@ -67,17 +66,26 @@ def find_by_id(id):
 
 def find_by_name(name):
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
-            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id " +\
-                "WHERE i.name=:name AND (o.user_id=:user_id OR v.user_id=:user_id)"
+        "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id " +\
+        "WHERE i.name=:name AND (o.user_id=:user_id OR v.user_id=:user_id)"
     items = db.session.execute(
         sql, {"name": name, "user_id": session["user_id"]}).fetchall()
     return items
 
 
+def find_by_similar_name(name):
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
+        "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id " +\
+        "WHERE i.name LIKE :name AND (o.user_id=:user_id OR v.user_id=:user_id)"
+    items = db.session.execute(
+        sql, {"name": "%"+name+"%", "user_id": session["user_id"]}).fetchall()
+    return items
+
+
 def find_by_tag(tag):
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
-            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id LEFT JOIN tags t ON i.id=t.item_id " +\
-                "WHERE t.tag=:tag AND (o.user_id=:user_id OR v.user_id=:user_id) ORDER BY i.name"
+        "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id LEFT JOIN tags t ON i.id=t.item_id " +\
+        "WHERE t.tag=:tag AND (o.user_id=:user_id OR v.user_id=:user_id) ORDER BY i.name"
     items = db.session.execute(
         sql, {"tag": tag, "user_id": session["user_id"]}).fetchall()
     return items
@@ -85,8 +93,8 @@ def find_by_tag(tag):
 
 def find_by_container(container_id):
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
-            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id  " +\
-                "WHERE i.location_id=:container_id AND (o.user_id=:user_id OR v.user_id=:user_id) ORDER BY i.name"
+        "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id  " +\
+        "WHERE i.location_id=:container_id AND (o.user_id=:user_id OR v.user_id=:user_id) ORDER BY i.name"
     items = db.session.execute(
         sql, {"container_id": container_id, "user_id": session["user_id"]}).fetchall()
     return items
@@ -94,8 +102,8 @@ def find_by_container(container_id):
 
 def fetch_all_items():
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
-            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id  " +\
-                "WHERE o.user_id=:user_id OR v.user_id=:user_id ORDER BY i.name"
+        "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id  " +\
+        "WHERE o.user_id=:user_id OR v.user_id=:user_id ORDER BY i.name"
     items = db.session.execute(
         sql, {"user_id": session["user_id"]}).fetchall()
     return items
@@ -165,7 +173,7 @@ def check_input(name, parent_item, location, dimensions, year, tags, id=None):
         samenameitem = find_by_name(name)
     if samenameitem and ((id and samenameitem[0].id != id) or not id):
         return 'Sinulla on jo samanniminen tavara!'
-    if not (id and location==get_all_by_id(id)[2]) and (len(parent_item) > 100 or (parent_item and not find_by_name(parent_item))):
+    if not (id and location == get_all_by_id(id)[2]) and (len(parent_item) > 100 or (parent_item and not find_by_name(parent_item))):
         return 'Sisältävää tavaraa ei löydy. Tarkista, että kirjoitit sen nimen oikein.'
     if len(location) > 100:
         return 'Sijainnin kuvaus on liian pitkä! Pituus saa olla enintään 100 merkkiä.'
@@ -201,7 +209,7 @@ def add_viewer(item_id, user_id):
     if already_exists:
         return 'Käyttäjällä on jo katseluoikeus tavaraan!'
     sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"
-    already_owner= db.session.execute(
+    already_owner = db.session.execute(
         sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
     if already_owner:
         return 'Käyttäjä on jo tavaran omistaja, joten et voi tehdä hänestä katselijaa!'
@@ -211,6 +219,8 @@ def add_viewer(item_id, user_id):
         db.session.commit()
     except Exception as e:
         return 'Epäonnistui :('
+    if not add_viewing_to_contents(item_id, user_id):
+        return 'Epäonnistui :('
     return 'success'
 
 
@@ -218,7 +228,7 @@ def add_owner(item_id, user_id):
     if not user_is_owner(item_id):
         return False
     sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"
-    already_owner= db.session.execute(
+    already_owner = db.session.execute(
         sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
     if already_owner:
         return 'Käyttäjä on jo tavaran omistaja!'
@@ -230,7 +240,35 @@ def add_owner(item_id, user_id):
         db.session.commit()
     except Exception as e:
         return 'Epäonnistui :('
+    if not add_viewing_to_contents(item_id, user_id):
+        return 'Epäonnistui :('
     return 'success'
+
+
+def add_viewing_to_contents(item_id, user_id):
+    try:
+        sql = "SELECT id FROM items WHERE location_id=:item_id"
+        items_inside = [item.id for item in db.session.execute(
+            sql, {"item_id": item_id}).fetchall()]
+        sql = "SELECT i.id FROM items i LEFT JOIN owners o ON i.id=o.item_id WHERE i.location_id=:item_id AND o.user_id=:user_id"
+        already_owned_items = [item.id for item in db.session.execute(
+            sql, {"item_id": item_id, "user_id": user_id}).fetchall()]
+        sql = "SELECT i.id FROM items i LEFT JOIN viewers v ON i.id=v.item_id WHERE i.location_id=:item_id AND v.user_id=:user_id"
+        already_viewable_items = [item.id for item in db.session.execute(
+            sql, {"item_id": item_id, "user_id": user_id}).fetchall()]
+        items_to_add_viewing_right = [
+            item for item in items_inside if item not in (already_owned_items+already_viewable_items)]
+        sql = 'INSERT INTO viewers (item_id, user_id) VALUES '
+        if len(items_to_add_viewing_right) > 0:
+            for id in items_to_add_viewing_right[:len(items_to_add_viewing_right)-1]:
+                sql += f'({id}, {user_id}), '
+            sql += f'({items_to_add_viewing_right[len(items_to_add_viewing_right)-1]}, {user_id})'
+            db.session.execute(sql)
+        db.session.commit()
+    except Exception as e:
+        return False
+    return True
+
 
 def user_is_owner(item_id):
     sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"

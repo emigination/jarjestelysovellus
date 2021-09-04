@@ -2,7 +2,7 @@
 {% extends "layout.html" %}
 {% block pagename %} Lisää omistaja tavarallesi {% endblock %}
 {% block content %}
-<p>Omistjan lisääminen ei poista omaa omistajuuttasi.</p>
+<p>Omistajan lisääminen ei poista omaa omistajuuttasi. Uusi omistaja saa tavaraan kaikki samat oikeudet kuin sinäkin ja näkee sen sisällön, mutta sisällä oleviin tavaroihin hän saa automaattisesti vain katseluoikeuden.</p>
 <form action="/new_owner" method="POST">
     <div class="form-group">
         <label for="username">Käyttäjätunnus, josta haluat tehdä tavaran {{item_name}} omistajan: </label>

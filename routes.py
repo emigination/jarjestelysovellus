@@ -1,4 +1,3 @@
-from os import error
 from flask import Flask, render_template, session, redirect, request
 from secrets import token_hex
 from app import app
@@ -90,7 +89,7 @@ def search_item():
 @app.route("/fetch_by_name")
 def fetch_by_name():
     name = request.args["name"]
-    result = items.find_by_name(name)
+    result = items.find_by_similar_name(name)
     if result:
         (locations, tags, no_of_contents) = items.get_tags_locations_contents(result)
         return render_template("search_results.html", items=result, tags=[tags], locations=locations, contents=no_of_contents)

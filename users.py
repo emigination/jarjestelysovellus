@@ -11,7 +11,6 @@ def create_user(name, password):
         db.session.execute(sql, {"name": name, "password": hash_value})
         db.session.commit()
     except Exception as e:
-        print(e)
         return False
     user = fetch_user(name)
     session["user_id"] = user.id
