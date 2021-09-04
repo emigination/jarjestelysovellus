@@ -30,9 +30,8 @@ def new_item(name, parent_item=None, location=None, dimensions=None, year=None, 
 
 
 def edit(id, name, parent_item, location, dimensions, year, tags):
-    sql = "SELECT user_id FROM owners WHERE item_id=:id"
-    if db.session.execute(sql, {"id": id}).fetchone().user_id != session["user_id"]:
-        return
+    if not user_is_owner(id):
+        return False
     if year.isnumeric():
         year = int(year)
     else:
@@ -58,13 +57,6 @@ def edit(id, name, parent_item, location, dimensions, year, tags):
     return True
 
 
-def find_by_name(name):
-    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND i.name=:name AND o.user_id=:owner_id"
-    items = db.session.execute(
-        sql, {"name": name, "owner_id": session["user_id"]}).fetchall()
-    return items
-
-
 def find_by_id(id):
     sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND i.id=:id AND o.user_id=:owner_id"
     item = db.session.execute(
@@ -72,25 +64,46 @@ def find_by_id(id):
     return item
 
 
-def find_by_tag(tag):
-    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o, tags t WHERE i.id=o.item_id AND i.id=t.item_id AND t.tag=:tag AND o.user_id=:owner_id ORDER BY i.name"
+def find_by_name(name):
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
+            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id " +\
+                "WHERE i.name=:name AND (o.user_id=:user_id OR v.user_id=:user_id)"
     items = db.session.execute(
-        sql, {"tag": tag, "owner_id": session["user_id"]}).fetchall()
+        sql, {"name": name, "user_id": session["user_id"]}).fetchall()
+    return items
+
+
+def find_by_tag(tag):
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
+            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id LEFT JOIN tags t ON i.id=t.item_id " +\
+                "WHERE t.tag=:tag AND (o.user_id=:user_id OR v.user_id=:user_id) ORDER BY i.name"
+    items = db.session.execute(
+        sql, {"tag": tag, "user_id": session["user_id"]}).fetchall()
     return items
 
 
 def find_by_container(container_id):
-    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND i.location_id=:container_id AND o.user_id=:owner_id ORDER BY i.name"
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
+            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id  " +\
+                "WHERE i.location_id=:container_id AND (o.user_id=:user_id OR v.user_id=:user_id) ORDER BY i.name"
     items = db.session.execute(
-        sql, {"container_id": container_id, "owner_id": session["user_id"]}).fetchall()
+        sql, {"container_id": container_id, "user_id": session["user_id"]}).fetchall()
     return items
 
 
 def fetch_all_items():
-    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year FROM items i, owners o WHERE i.id=o.item_id AND o.user_id=:owner_id ORDER BY i.name"
+    sql = "SELECT i.id, i.name, i.location_id, i.location, i.dimensions, i.year, u.name AS owner_name FROM items i " +\
+            "LEFT JOIN owners o ON i.id=o.item_id LEFT JOIN users u ON o.user_id=u.id LEFT JOIN viewers v ON i.id=v.item_id  " +\
+                "WHERE o.user_id=:user_id OR v.user_id=:user_id ORDER BY i.name"
     items = db.session.execute(
-        sql, {"owner_id": session["user_id"]}).fetchall()
+        sql, {"user_id": session["user_id"]}).fetchall()
     return items
+
+
+def get_name(id):
+    sql = "SELECT name FROM items WHERE id=:id"
+    item = db.session.execute(sql, {"id": id}).fetchone()
+    return item.name
 
 
 def get_item_tags(id):
@@ -112,14 +125,21 @@ def get_tags_locations_contents(result):
     contents = []
     for item in result:
         tags.append(get_item_tags(item.id))
-        location = find_by_id(item.location_id)
-        if location:
-            locations.append((location.id, location.name))
+        if item.location_id:
+            location_name = get_name(item.location_id)
+            locations.append(location_name)
         else:
-            locations.append(('',''))
+            locations.append('')
         no_of_contents = get_no_of_contents(item.id)
         contents.append(no_of_contents)
     return (locations, tags, contents)
+
+
+def get_no_of_contents(id):
+    sql = "SELECT COUNT(*) FROM items i WHERE i.location_id=:id"
+    number = db.session.execute(
+        sql, {"id": id}).fetchone()[0]
+    return number
 
 
 def get_all_by_id(id):
@@ -132,13 +152,6 @@ def get_all_by_id(id):
     for tag in get_item_tags(id):
         tagstring += tag.tag + ' '
     return (item, tagstring, location)
-
-
-def get_no_of_contents(id):
-    sql = "SELECT COUNT(*) FROM items i, owners o WHERE i.id=o.item_id AND i.location_id=:id AND o.user_id=:owner_id"
-    number = db.session.execute(
-        sql, {"id": id, "owner_id": session["user_id"]}).fetchone()[0]
-    return number
 
 
 def check_input(name, parent_item, location, dimensions, year, tags, id=None):
@@ -164,10 +177,9 @@ def check_input(name, parent_item, location, dimensions, year, tags, id=None):
 def delete_item(id):
     if not user_is_owner(id):
         return False
-    # sql = "SELECT user_id FROM owners WHERE item_id=:id"
-    # if db.session.execute(sql, {"id": id}).fetchone().user_id != session["user_id"]:
-    #     return False
     try:
+        sql = "UPDATE items SET location_id=NULL where location_id=:id"
+        db.session.execute(sql, {"id": id})
         sql = "DELETE FROM items WHERE id=:id"
         db.session.execute(sql, {"id": id})
         db.session.commit()
@@ -180,7 +192,8 @@ def add_viewer(item_id, user_id):
     if not user_is_owner(item_id):
         return False
     sql = "SELECT COUNT(*) FROM viewers WHERE item_id=:item_id AND user_id=:user_id"
-    already_exists = db.session.execute(sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
+    already_exists = db.session.execute(
+        sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
     if already_exists:
         return 'Käyttäjällä on jo katseluoikeus tavaraan!'
     sql = "INSERT INTO viewers (item_id,user_id) VALUES (:item_id,:user_id)"
@@ -194,7 +207,8 @@ def add_viewer(item_id, user_id):
 
 def user_is_owner(item_id):
     sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"
-    is_owner = db.session.execute(sql, {"item_id": item_id, "user_id": session["user_id"]}).fetchone()[0]
+    is_owner = db.session.execute(
+        sql, {"item_id": item_id, "user_id": session["user_id"]}).fetchone()[0]
     if is_owner:
         return True
     return False

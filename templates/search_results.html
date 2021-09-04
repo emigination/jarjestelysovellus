@@ -5,17 +5,20 @@
 {% for item in items %}
 <p>
     Tavara: {{item.name}}<br>
-    Sijainti: {% if locations[loop.index-1] is defined %}<a href="/fetch_contents/{{locations[loop.index-1][0]}}">{{locations[loop.index-1][1]}}</a>{% endif %} - {{item.location}}<br>
+    Sijainti: {% if locations[loop.index-1] is defined %}<a href="/fetch_contents/{{item.location_id}}">{{locations[loop.index-1]}}</a>{% endif %} - {{item.location}}<br>
     Mitat: {{item.dimensions}}<br>
     Vuosi: {% if item.year>0 %}{{item.year}}{% endif %}<br>
     Tägit: {% for tag in tags[loop.index-1] %}<a href="/fetch_by_tag_name/{{tag.tag}}">{{tag.tag}}</a>{% endfor %}<br>
     Tavaroita sisällä: {% if contents[loop.index-1]>0 %}<a href="/fetch_contents/{{item.id}}">{{contents[loop.index-1]}} kpl</a>{% else %}0 kpl{% endif %}
-</p>
+    {% if item.owner_name==session["name"] %}
     <form>
         <button type="submit" formaction="/edit_item/{{item.id}}" method="GET" class="btn btn-primary mt-2">Muokkaa</button>
         <button type="submit" formaction="/delete_item/{{item.id}}" method="GET" class="btn btn-primary mt-2">Poista</button>
         <button type="submit" formaction="/add_viewer/{{item.id}}" method="GET" class="btn btn-primary mt-2">Lisää katseluoikeus</button>
     </form>
+    {% else %} <br>Omistaja: {{item.owner_name}}
+    {% endif %}
+</p>
 <br>
 <br>
 {% endfor %}

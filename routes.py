@@ -87,11 +87,8 @@ def fetch_by_name():
     name = request.args["name"]
     result = items.find_by_name(name)
     if result:
-        tags = items.get_item_tags(result[0].id)
-        location = items.find_by_id(result[0].location_id)
-        if location:
-            location = (location.id, location.name)
-        return render_template("search_results.html", items=result, tags=[tags], locations=[location])
+        (locations, tags, no_of_contents) = items.get_tags_locations_contents(result)
+        return render_template("search_results.html", items=result, tags=[tags], locations=locations, contents=no_of_contents)
     else:
         no_of_items = items.get_no_of_items()
         return render_template("search_item.html", no_of_items=no_of_items, error='Hakemaasi tavaraa ei löydy!')
@@ -154,7 +151,7 @@ def fetch_all_items():
         return render_template("search_results.html", items=result, tags=tags, locations=locations, contents=no_of_contents)
     else:
         no_of_items = items.get_no_of_items()
-        return render_template("search_item.html", no_of_items=no_of_items, error=1)
+        return render_template("search_item.html", no_of_items=no_of_items, error='Sinulla ei ole yhtään tavaraa')
 
 
 @app.route("/edit_item/<int:id>")
@@ -184,8 +181,10 @@ def update_item(id):
 
 @app.route("/add_viewer/<int:id>")
 def add_viewer(id):
-    item_name = items.find_by_id(id).name
-    return render_template("add_viewer.html", item_id=id, item_name=item_name)
+    item = items.find_by_id(id)
+    if item:
+        return render_template("add_viewer.html", item_id=id, item_name=item.name)
+    return render_template("add_viewer.html", item_id=id, item_name=item.name, error='Epäonnistui :(')
 
 
 @app.route("/new_viewer", methods=["POST"])
