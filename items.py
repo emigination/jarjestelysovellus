@@ -114,9 +114,12 @@ def get_item_tags(id):
 
 def get_no_of_items():
     sql = "SELECT COUNT(*) FROM items i, owners o WHERE i.id=o.item_id AND o.user_id=:owner_id"
-    number = db.session.execute(
+    own = db.session.execute(
         sql, {"owner_id": session["user_id"]}).fetchone()[0]
-    return number
+    sql = "SELECT COUNT(*) FROM items i, viewers v WHERE i.id=v.item_id AND v.user_id=:user_id"
+    viewable = db.session.execute(
+        sql, {"user_id": session["user_id"]}).fetchone()[0]
+    return (own, viewable)
 
 
 def get_tags_locations_contents(result):
@@ -196,6 +199,11 @@ def add_viewer(item_id, user_id):
         sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
     if already_exists:
         return 'Käyttäjällä on jo katseluoikeus tavaraan!'
+    sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"
+    already_owner= db.session.execute(
+        sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
+    if already_owner:
+        return 'Käyttäjä on jo tavaran omistaja, joten et voi tehdä hänestä katselijaa!'
     sql = "INSERT INTO viewers (item_id,user_id) VALUES (:item_id,:user_id)"
     try:
         db.session.execute(sql, {"item_id": item_id, "user_id": user_id})
@@ -204,6 +212,24 @@ def add_viewer(item_id, user_id):
         return 'Epäonnistui :('
     return 'success'
 
+
+def add_owner(item_id, user_id):
+    if not user_is_owner(item_id):
+        return False
+    sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"
+    already_owner= db.session.execute(
+        sql, {"item_id": item_id, "user_id": user_id}).fetchone()[0]
+    if already_owner:
+        return 'Käyttäjä on jo tavaran omistaja!'
+    try:
+        sql = "INSERT INTO owners (item_id,user_id) VALUES (:item_id,:user_id)"
+        db.session.execute(sql, {"item_id": item_id, "user_id": user_id})
+        sql = "DELETE FROM viewers WHERE user_id=:user_id AND item_id=:item_id"
+        db.session.execute(sql, {"item_id": item_id, "user_id": user_id})
+        db.session.commit()
+    except Exception as e:
+        return 'Epäonnistui :('
+    return 'success'
 
 def user_is_owner(item_id):
     sql = "SELECT COUNT(*) FROM owners WHERE item_id=:item_id AND user_id=:user_id"

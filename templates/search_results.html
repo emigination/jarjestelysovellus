@@ -15,6 +15,7 @@
         <button type="submit" formaction="/edit_item/{{item.id}}" method="GET" class="btn btn-primary mt-2">Muokkaa</button>
         <button type="submit" formaction="/delete_item/{{item.id}}" method="GET" class="btn btn-primary mt-2">Poista</button>
         <button type="submit" formaction="/add_viewer/{{item.id}}" method="GET" class="btn btn-primary mt-2">Lisää katseluoikeus</button>
+        <button type="submit" formaction="/add_owner/{{item.id}}" method="GET" class="btn btn-primary mt-2">Lisää omistaja</button>
     </form>
     {% else %} <br>Omistaja: {{item.owner_name}}
     {% endif %}

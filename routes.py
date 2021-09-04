@@ -187,6 +187,14 @@ def add_viewer(id):
     return render_template("add_viewer.html", item_id=id, item_name=item.name, error='Epäonnistui :(')
 
 
+@app.route("/add_owner/<int:id>")
+def add_owner(id):
+    item = items.find_by_id(id)
+    if item:
+        return render_template("add_owner.html", item_id=id, item_name=item.name)
+    return render_template("add_owner.html", item_id=id, item_name=item.name, error='Epäonnistui :(')
+
+
 @app.route("/new_viewer", methods=["POST"])
 def new_viewer():
     username = request.form["username"]
@@ -201,6 +209,22 @@ def new_viewer():
             return render_template("success.html", title="Lisää katseluoikeus", action="Katseluoikeuden lisääminen")
         error = result
     return render_template("add_viewer.html", item_id=item_id, item_name=item_name, error=error)
+
+
+@app.route("/new_owner", methods=["POST"])
+def new_owner():
+    username = request.form["username"]
+    item_name = request.form["item_name"]
+    item_id = request.form["item_id"]
+    user = users.fetch_user(username)
+    if not user:
+        error = f'Käyttäjää {username} ei löydy!'
+    else:
+        result = items.add_owner(item_id, user.id)
+        if result == 'success':
+            return render_template("success.html", title="Lisää omistaja", action="Omistajan lisääminen")
+        error = result
+    return render_template("add_owner.html", item_id=item_id, item_name=item_name, error=error)
 
 
 @app.route("/delete_item/<int:id>")

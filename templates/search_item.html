@@ -2,7 +2,7 @@
 {% extends "layout.html" %}
 {% block pagename %} Etsi tavara {% endblock %}
 {% block content %}
-<p>Sinulla on yhteensä {{no_of_items}} tavara(a).</p>
+<p>Sinulla on {{no_of_items[0]}} tavara(a), joiden lisäksi sinulla on oikeus tarkastella {{no_of_items[1]}} tavara(a).</p>
 <form action="/fetch_by_name" method="GET">
     <div class="form-group">
         <label for="name">Tavaran nimi: </label>
@@ -25,7 +25,7 @@
 </form>
 <br>
 <form action="/fetch_all_items" method="GET">
-    <input type="submit" class="btn btn-primary mt-2 mb-4" value="Näytä kaikki tavarani">
+    <input type="submit" class="btn btn-primary mt-2 mb-4" value="Näytä kaikki tavarat">
 </form>
 {% if error %}
 <p>{{error}}</p>
